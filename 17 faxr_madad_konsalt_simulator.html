@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAXR MADAD KONSALT buxgalteriya maktabi - Test Simulyatori</title>
+    <style>
+        :root {
+            --primary-color: #1e3a8a; /* To'q ko'k */
+            --secondary-color: #2563eb;
+            --success-color: #16a34a;
+            --danger-color: #dc2626;
+            --bg-color: #f3f4f6;
+            --text-color: #1f2937;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 2rem 1rem;
+            text-align: center;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .question-number {
+            font-weight: 600;
+            color: var(--secondary-color);
+            margin-bottom: 0.5rem;
+            display: block;
+            font-size: 0.9rem;
+        }
+
+        .question-text {
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin-bottom: 1rem;
+        }
+
+        .options-list {
+            list-style: none;
+        }
+
+        .option-item {
+            display: block;
+            padding: 0.75rem 1rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.375rem;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .option-item:hover {
+            background-color: #f9fafb;
+            border-color: #d1d5db;
+        }
+
+        .option-item input[type="radio"] {
+            margin-right: 0.75rem;
+            transform: scale(1.2);
+            cursor: pointer;
+        }
+
+        .btn {
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.3s ease;
+            box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+        }
+
+        .btn:hover {
+            background-color: var(--primary-color);
+        }
+
+        /* Results Screen */
+        #results-screen {
+            display: none;
+        }
+
+        .score-board {
+            text-align: center;
+            padding: 2rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-radius: 0.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .score-board h2 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .score-stats {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            font-size: 1.2rem;
+        }
+
+        .result-item {
+            border-left: 4px solid;
+            padding-left: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .status-correct {
+            border-color: var(--success-color);
+            background-color: #f0fdf4;
+        }
+
+        .status-wrong {
+            border-color: var(--danger-color);
+            background-color: #fef2f2;
+        }
+
+        .result-answer {
+            margin-top: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .text-correct {
+            color: var(--success-color);
+            font-weight: 600;
+        }
+
+        .text-wrong {
+            color: var(--danger-color);
+            font-weight: 600;
+        }
+        
+        .table-data {
+            font-size: 0.9rem;
+            background: #f9fafb;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            white-space: pre-line;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>FAXR MADAD KONSALT</h1>
+        <p>Buxgalteriya maktabi - Maxsus soliq rejimi va daromadlar bo'yicha test simulyatori</p>
+    </header>
+
+    <div class="container" id="quiz-screen">
+        <form id="quiz-form">
+            <div id="questions-container">
+                <!-- Savollar JS orqali shu yerga yuklanadi -->
+            </div>
+            <button type="button" class="btn" onclick="submitQuiz()">Testni Yakunlash</button>
+        </form>
+    </div>
+
+    <div class="container" id="results-screen">
+        <div class="score-board">
+            <h2>Test Natijalari</h2>
+            <div class="score-stats">
+                <div>To'g'ri javoblar: <strong id="correct-count">0</strong> / 60</div>
+                <div>Foiz: <strong id="percentage">0</strong>%</div>
+            </div>
+        </div>
+
+        <div id="review-container">
+            <!-- Natijalar tahlili shu yerga yuklanadi -->
+        </div>
+        
+        <button type="button" class="btn" onclick="location.reload()" style="margin-top: 2rem;">Testni Qaytadan Boshlash</button>
+    </div>
+
+    <script>
+        const questionsData = [
+            // Fayl 1 (11 ta)
+            {
+                q: "Aylanmadan olinadigan soliq qaysi soliqlarning oʻrniga toʻlanadi?",
+                options: ["Foyda soligʻi", "QQS va foyda soligʻi", "Umumbelgilangan soliqlar", "JShDS va ijtimoiy soliqdan tashqari barcha soliqlar"],
+                correct: "QQS va foyda soligʻi"
+            },
+            {
+                q: "8 sentyabrda aylanmadan olinadigan soliq toʻlovchisi boʻlgan korxona QQS toʻlovchisi sifatida roʻyxatdan oʻtkazish uchun xabarnoma berdi. Mazkur korxona qanday soliqlarni va qanday davr uchun toʻlovchi hisoblanadi?",
+                options: ["Butun yil uchun aylanmadan olinadigan soliq toʻlovchi", "Butun yil uchun QQS va foyda soligʻi toʻlovchisi", "Yanvar–avgust uchun aylanmadan olinadigan soliq toʻlovchi va sentyabr–dekabr uchun QQS va foyda soligʻi toʻlovchisi", "Yanvar–sentyabr uchun aylanmadan olinadigan soliq toʻlovchi va oktyabr–dekabr uchun QQS va foyda soligʻi toʻlovchisi"],
+                correct: "Yanvar–sentyabr uchun aylanmadan olinadigan soliq toʻlovchi va oktyabr–dekabr uchun QQS va foyda soligʻi toʻlovchisi"
+            },
+            {
+                q: "Aylanmadan olinadigan soliq toʻlovchi boʻlgan korxona 30 noyabr holatiga quyidagi daromadlarga ega:\n- xizmatlar koʻrsatishdan olingan daromad – 982 mln soʻm;\n- mol-mulkni ijaraga berishdan olingan daromad – 16 mln soʻm;\n- asosiy vositani realizatsiya qilishdan olingan daromad – 7 mln soʻm.\nKorxona QQS va foyda soligʻini toʻlashga oʻtishi shartmi va qaysi davrdan boshlab?",
+                options: ["Joriy yilning 1 noyabridan boshlab oʻtishi shart", "Keyingi yilning 1 yanvaridan boshlab oʻtishi shart", "Joriy yilning 1 dekabridan boshlab oʻtishi shart", "Aylanmadan olinadigan soliq toʻlovchi boʻlib qolishi mumkin"],
+                correct: "Joriy yilning 1 dekabridan boshlab oʻtishi shart"
+            },
+            {
+                q: "Kim aylanmadan olinadigan soliqni toʻlashni tanlashga haqli EMAS?",
+                options: ["Markazlashtirilgan moliyalashtirish manbalari hisobidan ob’yektlarni kapital ta’mirlashni bajaruvchi yuridik shaxslar", "Jami yillik daromadi 100 mln soʻmgacha boʻlgan yuridik shaxslar", "Aksiz soligʻi toʻlanadigan mahsulotlarni ishlab chiqaruvchilar", "Jami yillik daromadi 200 mln soʻm boʻlgan yakka tartibdagi tadbirkorlar"],
+                correct: "Aksiz soligʻi toʻlanadigan mahsulotlarni ishlab chiqaruvchilar"
+            },
+            {
+                q: "Faoliyat koʻrsatayotgan korxona qanday muddatda aylanmadan olinadigan soliqqa oʻtish toʻgʻrisida bildirishnoma berishi zarur?",
+                options: ["Yil boshlanishiga qadar 10 kundan kechiktirmay", "Chorak boshlanishiga qadar 10 kundan kechiktirmay", "Yilning birinchi oyining 10-sanasidan kechiktirmay", "Chorakning birinchi oyining 10-sanasidan kechiktirmay"],
+                correct: "Yil boshlanishiga qadar 10 kundan kechiktirmay"
+            },
+            {
+                q: "Korxona aylanmadan olinadigan soliqni toʻlashni ixtiyoriy ravishda rad etgandan keyin qanday davrdan keyin u qayta aylanmadan olinadigan soliq toʻlovchi boʻlishi mumkin?",
+                options: ["Keyingi chorakning boshidan", "Keyingi yilning boshidan", "12 oydan keyin", "Keyingi oyning boshidan"],
+                correct: "12 oydan keyin"
+            },
+            {
+                q: "Aylanmadan olinadigan soliq toʻlovchilar yana qanday soliqlarni toʻlaydi (eng toʻliq javobni tanlang)?",
+                options: ["Mol-mulk soligʻi, yer soligʻi, suv resurslaridan foydalanganlik uchun soliq va ijtimoiy soliq", "Soliq agentlari tomonidan toʻlanadigan soliqlar, mol-mulk soligʻi, yer soligʻi, suv resurslaridan foydalanganlik uchun soliq va ijtimoiy soliq", "Soliq agentlari tomonidan toʻlanadigan soliqlar", "Mol-mulk soligʻi, yer soligʻi, suv resurslaridan foydalanganlik uchun soliq"],
+                correct: "Soliq agentlari tomonidan toʻlanadigan soliqlar, mol-mulk soligʻi, yer soligʻi, suv resurslaridan foydalanganlik uchun soliq va ijtimoiy soliq"
+            },
+            {
+                q: "Yuridik shaxslar uchun aylanmadan olinadigan soliqni qoʻllash uchun asosiy shart qanday?",
+                options: ["Jami daromadi bir yil uchun 1 mlrd soʻmdan oshmasligi kerak", "Xodimlarning oʻrtacha yillik soni 20 kishidan oshmasligi kerak", "Jami daromadi bir yil uchun 100 mln soʻmdan oshmasligi kerak", "Korxona kichik biznes toifasiga kirishi kerak"],
+                correct: "Jami daromadi bir yil uchun 1 mlrd soʻmdan oshmasligi kerak"
+            },
+            {
+                q: "Yakka tartibdagi tadbirkorning toʻliq yildagi faoliyati uchun jami daromadi 87 600 ming soʻmni tashkil etdi. Mazkur yakka tartibdagi tadbirkor aylanmadan olinadigan soliqni toʻlashga oʻtish huquqiga egami va nima uchun?",
+                options: ["Ha, sababi jami daromadi 1 mlrd soʻmdan oshmaydi", "Ha, agar yil boshlanishiga qadar 10 kundan kechiktirmay bildirishnoma bersa", "Yoʻq, sababi yakka tartibdagi tadbirkor aylanmadan olinadigan soliqni toʻlashga haqli emas", "Yoʻq, sababi jami daromadi 100 mln soʻmdan koʻp boʻlishi kerak"],
+                correct: "Yoʻq, sababi jami daromadi 100 mln soʻmdan koʻp boʻlishi kerak"
+            },
+            {
+                q: "Korxona 6 iyunda roʻyxatdan oʻtkazilgan. Roʻyxatdan oʻtkazishda korxona aylanmadan olinadigan soliqni toʻlashni tanladi. 30 noyabr holati boʻyicha (roʻyxatdan oʻtkazilgan kundan e’tiboran 178 kun) korxonaning jami daromadi 486 900 ming soʻmni tashkil etdi. Keyingi yilda aylanmadan olinadigan soliq toʻlovchi boʻlib qolishi uchun dekabr uchun korxonaning jami daromadi qanday chegara doirasida boʻlishi kerak?",
+                options: ["85 703 ming soʻmdan oshmasligi kerak", "771 ming soʻmdan koʻp emas", "213 100 ming soʻmdan koʻp emas", "513 100 ming soʻmdan koʻp emas"],
+                correct: "85 703 ming soʻmdan oshmasligi kerak"
+            },
+            {
+                q: "Aylanmadan olinadigan soliq toʻlovchi boʻlgan korxonaning 2022 yil yanvar-aprel uchun jami daromadi 1 mlrd soʻmdan oshdi. May oyidan boshlab korxona QQS va foyda soligʻini toʻlashga oʻtishi shart. Korxona qaysi davrdan boshlab aylanmadan olinadigan soliqni toʻlashga qaytishga haqli?",
+                options: ["2023 yil boshidan", "2023 yil maydan boshlab", "2023 yil iyuldan, basharti jami daromadi 2022 yilning III choragidan 2023 yilning II choragiga qadar 1 mlrd soʻmdan oshmasa", "2024 yil boshidan, basharti 2023 yilning jami daromadi 1 mlrd soʻmdan oshmasa"],
+                correct: "2024 yil boshidan, basharti 2023 yilning jami daromadi 1 mlrd soʻmdan oshmasa"
+            },
+
+            // Fayl 2 (6 ta)
+            {
+                q: "Joriy yilning I choragida aylanmadan olinadigan soliq toʻlovchisi boʻlgan korxona quyidagi daromadlarni oldi:\n- mol-mulkni operativ ijaraga berishdan – 120 000 ming soʻm;\n- konsalting xizmatlari koʻrsatishdan – 60 000 ming soʻm.\nAsosiy faoliyati mol-mulkni ijaraga berish boʻlgan korxonalar uchun aylanmadan olinadigan soliq stavkasi – 8%, iqtisodiyotning boshqa tarmoqlari korxonalari uchun – 4%. Korxona I chorak uchun daromadlarga qanday soliq stavkalarini qoʻllashi kerak?",
+                options: ["Barcha daromadlarga 4%", "Ijaradan olingan daromadlarga – 4%, konsaltingdan olingan daromadlarga – 8%", "Barcha daromadlarga 8%", "Ijaradan olingan daromadlarga – 8%, konsaltingdan olingan daromadlarga – 4%"],
+                correct: "Ijaradan olingan daromadlarga – 8%, konsaltingdan olingan daromadlarga – 4%"
+            },
+            {
+                q: "Talab qilish huquqidan oʻzganing foydasiga voz kechish shartnomasiga asosan korxona 7 000 ming soʻm evaziga kreditorning huquqini oldi. Majburiyatlarni bajarish hisobiga qarzdor 8 500 ming soʻm miqdorida qarzni toʻladi... 2022 yil I chorakda aylanmadan olinadigan soliq boʻyicha soliq bazasiga kiritiladigan summani aniqlang.",
+                options: ["26 500 ming soʻm", "1 500 ming soʻm", "33 500 ming soʻm", "7 000 ming soʻm"],
+                correct: "1 500 ming soʻm"
+            },
+            {
+                q: "Aylanmadan olinadigan soliq toʻlovchi korxona chorak yakuni boʻyicha daromadlari:\nUmumovqatlanish: 7 350 (8%)\nVositachilik: 2 800 (25%)\nAvtomobil ta'mir: 3 590 (4%)\nIjara: 3 100 (4%)\nBoshqa daromad: 1 850 (Asosiy faoliyat stavkasida).\nJami daromad nimaga teng?",
+                options: ["13 740 ming soʻm", "10 940 ming soʻm", "16 840 ming soʻm", "18 690 ming soʻm"],
+                correct: "18 690 ming soʻm"
+            },
+            {
+                q: "Yuqoridagi (umumovqatlanish asosiy faoliyat bo'lgan) ma'lumotlar asosida, Asosiy vositalarni sotish operatsiyalari boʻyicha aylanmadan olinadigan soliq nimaga teng?",
+                options: ["462,5 ming soʻm", "296 ming soʻm", "74 ming soʻm", "148 ming soʻm"],
+                correct: "148 ming soʻm"
+            },
+            {
+                q: "Yuqoridagi ma'lumotlar asosida, Birinchi chorak uchun umumiy aylanmadan olinadigan soliq nimaga teng?",
+                options: ["1 703,6 ming soʻm", "2 025 ming soʻm", "1 629,6 ming soʻm", "1 431 ming soʻm"],
+                correct: "1 703,6 ming soʻm"
+            },
+            {
+                q: "Alohida-alohida hisob yuritishda, faoliyat turlari boʻyicha ulushlarni aniqlashda, avtomobillarni ta’mirlashdan daromad ulushi nimaga teng?",
+                options: ["21%", "11%", "33%", "19%"],
+                correct: "21%"
+            },
+
+            // Fayl 3 (7 ta)
+            {
+                q: "2022 yilning mart oyida... auditorlik tekshiruvi chogʻida 2018 yildagi 12 mln soʻm tushum hisobga olinmaganligi aniqlandi. 2018 yilda YaST stavkasi – 5%, 2022 yilda aylanmadan soliq – 4%. Soliq solish maqsadida oʻtgan yillarda olingan daromadning qanday summasi 2022 yildagi jami daromaddan chegiriladi?",
+                options: ["120 000 soʻm", "600 000 soʻm", "0 soʻm", "480 000 soʻm"],
+                correct: "600 000 soʻm"
+            },
+            {
+                q: "Aylanmadan olinadigan soliq hisob-kitobida qanday daromadlar chegiriladi?",
+                options: ["Qaytariladigan tara qiymati, agar u ilgari daromadga kiritilmagan boʻlsa; majburiyatlarni hisobdan chiqarishdan olingan daromad", "Hisobot yilida aniqlangan oʻtgan yillarda olingan daromadlar; olingan dividendlar", "Asosiy vositalarning chiqib ketishida qayta baholash hisobiga hosil boʻlgan daromadlar; kursdagi ijobiy farqning salbiy farqdan oshishi", "Olingan dividendlar; asosiy vositalarni realizatsiya qilishda qayta baholash hisobiga hosil boʻlgan daromadlar"],
+                correct: "Hisobot yilida aniqlangan oʻtgan yillarda olingan daromadlar; olingan dividendlar"
+            },
+            {
+                q: "Qanday daromadlar aylanmadan olinadigan soliq hisob-kitobida jami daromaddan chegirilMAYdi?",
+                options: ["Majburiyatlarni hisobdan chiqarishdan olingan daromadlar", "Asosiy vositalarni tugatishda ularni qoʻshimcha baholashda olingan ortiqcha summa hisobidan olingan daromadlar", "Joriy yilda aniqlangan oʻtgan yillarda olingan daromadlar", "Davlat qimmatli qogʻozlari bilan operatsiyalar boʻyicha daromadlar"],
+                correct: "Majburiyatlarni hisobdan chiqarishdan olingan daromadlar"
+            },
+            {
+                q: "Keltirilganlardan nima aylanmadan olinadigan soliq solish ob’yekti hisoblanadi?",
+                options: ["Faqat tekin olingan mulkiy huquqlar", "Tekin olingan mol-mulk va tekin olingan xizmatlar", "Faqat birgalikdagi faoliyatdan daromad", "Soliq agentlari tomonidan to'lanadigan summalar"],
+                correct: "Tekin olingan mol-mulk va tekin olingan xizmatlar"
+            },
+            {
+                q: "Qanday xarajatlar aylanmadan olinadigan soliq boʻyicha soliq bazasini kamaytirishi mumkin?",
+                options: ["Turizm faoliyati sub’yektlarida turistik xizmatlarni onlayn bronlashtirish boʻyicha dasturiy mahsulotlarni joriy etishga yoʻnaltirilgan mablagʻlar", "Homiylik uchun yoʻnaltirilgan mablagʻlar, biroq soliq bazasining 50%idan koʻp emas", "Yangi texnologik uskunani sotib olish bilan bogʻliq xarajatlar, biroq soliq bazasining 50%idan koʻp emas", "Tovarlarning butun turkumini import qilishda bojxona rasmiylashtiruvi boʻyicha vositachining xarajatlari"],
+                correct: "Turizm faoliyati sub’yektlarida turistik xizmatlarni onlayn bronlashtirish boʻyicha dasturiy mahsulotlarni joriy etishga yoʻnaltirilgan mablagʻlar"
+            },
+            {
+                q: "140 000 ming soʻm miqdorida konsignatsiya tovarini olib kirishda korxona... (jami bojxona to'lovlari 101 500 ming). Tovarning 70%i realizatsiya qilindi. 98 000 ming soʻm daromad olindi. Konsignatorda soliq bazasi nimaga teng?",
+                options: ["26 950 ming soʻm", "98 000 ming soʻm", "68 600 ming soʻm", "0 soʻm"],
+                correct: "26 950 ming soʻm"
+            },
+            {
+                q: "Koʻp marta aylanadigan tarada tovar realizatsiya qilindi. I chorakda 26 000 ming (tara 1 500 ming). II chorakda realizatsiya 138 000 ming, aprelda tara qaytarildi (1 500 ming). II chorak uchun soliq bazasi nimaga teng?",
+                options: ["112 000 ming soʻm", "136 500 ming soʻm", "139 500 ming soʻm", "138 000 ming soʻm"],
+                correct: "136 500 ming soʻm"
+            },
+
+            // Fayl 4 (8 ta)
+            {
+                q: "Keltirilganlardan nima jami daromad tarkibiga kiritilMAYdi?",
+                options: ["Kursdagi ijobiy farqning salbiy farqdan oshishi", "Ustav kapitaliga hissa tarzida olingan mablagʻlar", "Tekin olingan mol-mulk", "Birgalikdagi faoliyatda ishtirok etishdan olingan daromad"],
+                correct: "Ustav kapitaliga hissa tarzida olingan mablagʻlar"
+            },
+            {
+                q: "Tashkilot tovarni vositachilik shartnomasi boʻyicha 950 mln soʻmga realizatsiya qildi. Vositachilik haqi 277,5 mln soʻm. Ijaradan daromad 150 mln soʻm. Bolalar uyiga tekin berilgan tovar tannarxi 340 mln soʻm. Tashkilotning jami daromadi miqdori qanday?",
+                options: ["0 soʻm", "427,5 mln soʻm", "767,5 mln soʻm", "2 000 mln soʻm"],
+                correct: "427,5 mln soʻm"
+            },
+            {
+                q: "Mol-mulkni lizingga beruvchi tashkilotda nima aylanmadan olinadigan soliq boʻyicha soliq solish ob’yekti hisoblanadi?",
+                options: ["Lizing toʻlovi summasi", "Lizing toʻlovi tarkibida mol-mulk qiymatini qoplash summasi", "Lizing boʻyicha foizli daromad summasi", "Asosiy qarz va foizlar yig'indisi"],
+                correct: "Lizing boʻyicha foizli daromad summasi"
+            },
+            {
+                q: "Korxona sport muassasasiga tovarni tekinga berdi. Tannarxi 349 ming soʻm, bozor qiymati – 392 ming soʻm. Daromadni qanday summada e’tirof etish lozim?",
+                options: ["349 ming soʻm", "392 ming soʻm", "0 soʻm", "370,5 ming soʻm"],
+                correct: "0 soʻm"
+            },
+            {
+                q: "Hisoblash usuli boʻyicha daromad qaysi paytda e’tirof etiladi?",
+                options: ["Tovarni realizatsiya qilish paytida", "Tovarni ombordan joʻnatish paytida", "Tovar uchun toʻlov kelib tushgan paytda", "Tomonlar bilan kelishilgan va shartnomada koʻrsatilgan paytda"],
+                correct: "Tovarni realizatsiya qilish paytida"
+            },
+            {
+                q: "Mol-mulkni operativ ijaraga berishdan olingan daromadni e’tirof etish tartibi qanday?",
+                options: ["Daromad har oyda oyning oxirgi sanasida e’tirof etiladi", "Daromad ijara haqi kelib tushgan paytda e’tirof etiladi", "Daromad ijara muddatining oxirida e’tirof etiladi", "Daromad har chorakda chorakning oxirgi sanasida e’tirof etiladi"],
+                correct: "Daromad har oyda oyning oxirgi sanasida e’tirof etiladi"
+            },
+            {
+                q: "Realizatsiyadan daromad 938 ming, ustav kapitaliga hissa 1 200 ming, tekin olingan mulk 328 ming, kursdagi ijobiy farqning salbiy farqdan oshishi 120 ming. Jami daromad nimaga teng?",
+                options: ["1 058 ming soʻm", "2 586 ming soʻm", "1 386 ming soʻm", "1 266 ming soʻm"],
+                correct: "1 386 ming soʻm"
+            },
+            {
+                q: "Nima aylanmadan olinadigan soliq boʻyicha soliq solish ob’yekti hisoblanadi?",
+                options: ["Jami daromad", "Yalpi foyda", "Realizatsiya boʻyicha aylanma", "Realizatsiya qilishdan olingan tushum"],
+                correct: "Jami daromad"
+            },
+
+            // Fayl 5 (6 ta)
+            {
+                q: "Tovar qaytarilganda daromadga qaysi soliq davrida tuzatish kiritiladi?",
+                options: ["Tovar qaytarilgan davrdan keyingi davrda", "Tovarni qaytarish toʻgʻrisida qoʻshimcha kelishuv rasmiylashtirilgan davrda", "Tovar qaytarilgan davrda", "Tovarni realizatsiya qilishdan olingan daromad dastlab e’tirof etilgan davrda"],
+                correct: "Tovar qaytarilgan davrda"
+            },
+            {
+                q: "Yetkazib beruvchi 25% boʻnak olib IV chorakda 7 000 ming soʻm tovar joʻnatdi va soliq bazasiga kiritdi. Xaridor to'lolmadi, 6 yanvarda shartnoma o'zgarib 2 oy davomida oyiga 2 750 mingdan to'laydigan bo'ldi. I chorakda daromadga qanday tuzatish kiritish zarur?",
+                options: ["500 ming soʻmga oshirish", "250 ming soʻmga kamaytirish", "500 ming soʻmga kamaytirish", "250 ming soʻmga oshirish"],
+                correct: "250 ming soʻmga oshirish"
+            },
+            {
+                q: "Qanday hollarda daromadga tuzatish kiritish amalga oshiriladi?",
+                options: ["Barcha keltirilgan hollarda", "Sotib oluvchi chegirmalardan foydalanganda", "Tovarlar toʻliq yoki qisman qaytarilganda, koʻrsatilgan xizmatlardan voz kechilganda", "Bitim shartlari oʻzgarganda"],
+                correct: "Barcha keltirilgan hollarda"
+            },
+            {
+                q: "Keltirilgan qaysi holda Soliq kodeksi daromadga tuzatish kiritishni nazarda tutadi?",
+                options: ["Bitim shartlari oʻzgarganda", "Tomonlardan biri oʻz majburiyatlaridan voz kechganda", "Fors-major holatlari roʻy berganda", "Sud qarori mavjud boʻlganda"],
+                correct: "Bitim shartlari oʻzgarganda"
+            },
+            {
+                q: "Keltirilgan hujjatlarning qaysi biri asosida aylanmadan olinadigan soliq solish maqsadida daromadga tuzatish kiritish amalga oshiriladi?",
+                options: ["Buxgalteriya ma’lumotnomasi", "Tuzatilgan hisobvaraq-faktura", "Tushuntirish xati", "Qoʻshimcha hisobvaraq-faktura"],
+                correct: "Qoʻshimcha hisobvaraq-faktura"
+            },
+            {
+                q: "Kafolat muddati belgilanmagan boʻlsa, tovarlar qaytarilganda daromadga qanday davr doirasida tuzatish kiritish mumkin?",
+                options: ["Qonun hujjatlarida bunday davr belgilanmagan", "Yarim yil doirasida", "Bir yil doirasida", "Uch yil doirasida"],
+                correct: "Bir yil doirasida"
+            },
+
+            // Fayl 6 (6 ta)
+            {
+                q: "Aylanmadan olinadigan soliq toʻlovchi boʻlgan korxona mart uchun soliqni qaysi muddatda toʻlashi zarur?",
+                options: ["15 apreldan kechiktirmay", "25 apreldan kechiktirmay", "20 apreldan kechiktirmay", "1 apreldan kechiktirmay"],
+                correct: "15 apreldan kechiktirmay"
+            },
+            {
+                q: "Toshkent shahrida roʻyxatdan oʻtkazilgan aylanmadan olinadigan soliq toʻlovchi boʻlgan korxona ulgurji-chakana savdoni amalga oshiradi. U I chorak uchun aylanmadan olinadigan soliq boʻyicha hisobotni qaysi muddatda topshirishi zarur?",
+                options: ["1 apreldan kechiktirmay", "20 apreldan kechiktirmay", "15 apreldan kechiktirmay", "25 apreldan kechiktirmay"],
+                correct: "15 apreldan kechiktirmay"
+            },
+            {
+                q: "Quyida keltirilgan ma'lumotlar asosida aylanmadan olinadigan soliq summasini aniqlang (Masala bo'yicha to'g'ri hisobni tanlang):",
+                options: ["2 514 ming soʻm", "2 558 ming soʻm", "2 434 ming soʻm", "2 638 ming soʻm"],
+                correct: "2 514 ming soʻm"
+            },
+            {
+                q: "Keltirilgan ma'lumotlar asosida tegishli foiz ko'rsatkichini aniqlang:",
+                options: ["51%", "57%", "48%", "69%"],
+                correct: "51%"
+            },
+            {
+                q: "Taqdim etilgan ko'rsatkichlar asosida soliq bazasini aniqlang:",
+                options: ["15 200 ming soʻm", "29 800 ming soʻm", "31 800 ming soʻm", "26 700 ming soʻm"],
+                correct: "31 800 ming soʻm"
+            },
+            {
+                q: "Hisobot ma'lumotlari asosida to'lanishi lozim bo'lgan soliq summasini hisoblang:",
+                options: ["775 ming soʻm", "248 ming soʻm", "155 ming soʻm", "124 ming soʻm"],
+                correct: "124 ming soʻm"
+            },
+
+            // Fayl 7 (8 ta)
+            {
+                q: "Lizing kompaniyasi korxonaga 480 mln soʻmlik uskunani lizingga taqdim etdi (4 yil). Qoplash summasi oyiga 10 000 ming, foizli daromad oyiga 1 600 ming soʻm. Yil uchun lizing beruvchining soliq solinadigan daromadi nimaga teng?",
+                options: ["120 000 ming soʻm", "139 200 ming soʻm", "1 600 ming soʻm", "19 200 ming soʻm"],
+                correct: "19 200 ming soʻm"
+            },
+            {
+                q: "Mol–mulkni lizingga beruvchi tashkilot uchun nima daromad hisoblanadi?",
+                options: ["Lizing toʻlovi summasi", "Lizingga beriladigan mol-mulk qiymati", "Lizing toʻlovi va foizli daromad oʻrtasidagi farq", "Lizing boʻyicha foizli daromad summasi"],
+                correct: "Lizing boʻyicha foizli daromad summasi"
+            },
+            {
+                q: "Hisobot davri uchun uzoq muddatli kontraktlarni bajarishdan olingan daromad qanday aniqlanadi?",
+                options: ["Muayyan davr uchun kontrakt boʻyicha qiymatning solishtirma miqdori sifatida", "Buyurtmachi tomonidan tasdiqlangan xizmatlar qiymati sifatida", "Kontrakt boʻyicha xarajatlarning umumiy summasida qilingan xarajatlarning solishtirma miqdori va kontraktning umumiy qiymatining koʻpaytmasi sifatida aniqlanadi", "Kontraktning umumiy qiymatini uni bajarishning butun muddatiga boʻlish bilan"],
+                correct: "Kontrakt boʻyicha xarajatlarning umumiy summasida qilingan xarajatlarning solishtirma miqdori va kontraktning umumiy qiymatining koʻpaytmasi sifatida aniqlanadi"
+            },
+            {
+                q: "Vositachi kompyuterlarni (180 000 ming so'm) 3,5% vositachilik haqi evaziga sotishni o'z zimmasiga oldi. Hisobotga muvofiq 72 000 ming soʻmlik qismi realizatsiya qilindi. Ushbu operatsiyadan vositachining daromadi nimaga teng?",
+                options: ["6 300 ming soʻm", "2 520 ming soʻm", "72 000 ming soʻm", "180 000 ming soʻm"],
+                correct: "2 520 ming soʻm"
+            },
+            {
+                q: "Tikuv fabrikasi qoldiq mablag'ni (10 800 ming) oldi, vositachi 1 200 ming haqi ushlab qoldi. To'g'ridan to'g'ri realizatsiya - 150 000 ming so'm. Kasalxonaga bepul (tannarxi jami 1 500 ming). Aylanmadan soliq stavkalar: i.ch 4%, vositachilik 25%. Aylanmadan olinadigan soliqni hisoblang.",
+                options: ["9 000 ming soʻm", "8 700 ming soʻm", "6 480 ming soʻm", "6 000 ming soʻm"],
+                correct: "6 480 ming soʻm"
+            },
+            {
+                q: "Nima vositachilik xizmatlaridan olingan daromad hisoblanadi?",
+                options: ["Komitent (ishonch bildiruvchi) manfaatlarini koʻzlab realizatsiya qilingan tovar qiymati", "Shartnoma boʻyicha bitim summasi", "Vositachilik tovarini realizatsiya qilganlik uchun xaridorlardan kelib tushgan pul mablagʻlari summasi", "Koʻrsatilgan xizmatlar uchun vositachilik haqi"],
+                correct: "Koʻrsatilgan xizmatlar uchun vositachilik haqi"
+            },
+            {
+                q: "Marketing xizmatlari shartnomasi 72 000 ming soʻm (smeta bo'yicha 30 000 ming xarajat). Birinchi yil oxiriga jami 21 000 ming xarajat qilindi. Kontrakt amal qiladigan ikkinchi yilda e’tirof etiladigan daromad nimaga teng?",
+                options: ["42 000 ming soʻm", "21 600 ming soʻm", "72 000 ming soʻm", "50 400 ming soʻm"],
+                correct: "21 600 ming soʻm"
+            },
+            {
+                q: "Qurilish pudrati bo'yicha jami ish 630 000 ming (materiallar 72 000 ming kiritilgan). Subpudratchilar ish hajmi 290 000 ming. Korxonaning soliq solinadigan daromadi nimaga teng?",
+                options: ["268 000 ming soʻm", "340 000 ming soʻm", "558 000 ming soʻm", "630 000 ming soʻm"],
+                correct: "268 000 ming soʻm"
+            },
+
+            // Fayl 8 (8 ta)
+            {
+                q: "Keltirilganlardan nima aylanmadan olinadigan soliq solish maqsadida jami daromad tarkibiga kiritilMAYdi?",
+                options: ["Sugʻurta shartnomasi boʻyicha sugʻurta tovoni", "Operativ ijarada ijara haqi", "Vositachining vositachilik haqi", "Xizmatlar koʻrsatishdan olingan daromad"],
+                correct: "Sugʻurta shartnomasi boʻyicha sugʻurta tovoni"
+            },
+            {
+                q: "Ijaraga beruvchi ofis binosi ijara haqi 2 100 ming soʻm, kommunal va aloqa qoplash 575 ming soʻm. Har oylik daromad qanday?",
+                options: ["2 100 ming soʻm", "2 175 ming soʻm", "2 600 ming soʻm", "2 675 ming soʻm"],
+                correct: "2 100 ming soʻm"
+            },
+            {
+                q: "Realizatsiya - 17 200, Ijara - 2 400, Kommunal qoplash - 328, Bank krediti - 40 000, Kursdagi farq - 68. Jami daromad nimaga teng?",
+                options: ["19 996 ming soʻm", "59 600 ming soʻm", "59 668 ming soʻm", "19 668 ming soʻm"],
+                correct: "19 668 ming soʻm"
+            },
+            {
+                q: "«AVS» MChJ «XYZ» MChJdagi ustav kapitalidan chiqishda 82 000 ming soʻm aktivning 40% ini oldi. Dastlabki hissa 60 000. «AVS» aylanmadan olinadigan soliqni qanday summadan hisoblaydi?",
+                options: ["60 000 ming soʻm", "22 000 ming soʻm", "0 soʻm", "32 800 ming soʻm"],
+                correct: "0 soʻm"
+            },
+            {
+                q: "Birinchi chorakda korxona: realizatsiya qildi 4 300; oldindan to'lov oldi 2 400; garov uskunasi oldi 18 000. Daromad miqdori qanday?",
+                options: ["24 700 ming soʻm", "4 300 ming soʻm", "6 700 ming soʻm", "22 300 ming soʻm"],
+                correct: "4 300 ming soʻm"
+            },
+            {
+                q: "Asosiy vosita 13 200 ga realizatsiya qilindi. Boshlang'ich qiymat 11 800, eskirish 1 280. Daromadga kiritiladigan summani toping.",
+                options: ["13 200 ming soʻm", "10 520 ming soʻm", "Asosiy vositani realizatsiya qilishdan olingan daromad jami daromadiga kiritilmaydi", "2 680 ming soʻm"],
+                correct: "2 680 ming soʻm"
+            },
+            {
+                q: "Aylanmadan olinadigan soliq toʻlovchi boʻlgan ijaraga beruvchi ofis binosini ijaraga beradi. Ijara haqi 2 100, kommunal 575. Daromad qanday?",
+                options: ["2 600 ming soʻm", "2 675 ming soʻm", "2 100 ming soʻm", "2 175 ming soʻm"],
+                correct: "2 100 ming soʻm"
+            },
+            {
+                q: "Kichik korxona: Ishlab chiqarish - 100 000 (4%), Konsalting - 30 000 (4%), Vositachilik - 10 000 (25%), Ijara - 25 000 (4%). AV sotish 15 000 (boshlang'ich 18 000, eskirish 11 000, oshkangan qoldiq 1 500). Chorak aylanma solig'ini toping.",
+                options: ["4 300 ming soʻm", "8 700 ming soʻm", "11 075 ming soʻm", "9 080 ming soʻm"],
+                correct: "9 080 ming soʻm"
+            }
+        ];
+
+        // Savol variantlarini random (tasodifiy) qilish funksiyasi
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        // Testlarni ekranga yuklash
+        const questionsContainer = document.getElementById('questions-container');
+
+        questionsData.forEach((item, index) => {
+            // Javob variantlarini tasodifiy tartibda aralashtirish
+            let shuffledOptions = [...item.options];
+            shuffleArray(shuffledOptions);
+
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `
+                <span class="question-number">${index + 1}-savol</span>
+                <p class="question-text">${item.q.replace(/\n/g, '<br>')}</p>
+                <ul class="options-list">
+                    ${shuffledOptions.map((opt, i) => `
+                        <label class="option-item">
+                            <input type="radio" name="q${index}" value="${opt.replace(/"/g, '&quot;')}">
+                            ${opt}
+                        </label>
+                    `).join('')}
+                </ul>
+            `;
+            questionsContainer.appendChild(card);
+        });
+
+        // Testni tekshirish funksiyasi
+        function submitQuiz() {
+            let score = 0;
+            let reviewHTML = '';
+            let allAnswered = true;
+
+            for (let i = 0; i < questionsData.length; i++) {
+                const selectedOption = document.querySelector(`input[name="q${i}"]:checked`);
+                
+                if (!selectedOption) {
+                    allAnswered = false;
+                    break;
+                }
+            }
+
+            if (!allAnswered) {
+                alert("Iltimos, barcha savollarga javob belgilang!");
+                return;
+            }
+
+            for (let i = 0; i < questionsData.length; i++) {
+                const selectedOption = document.querySelector(`input[name="q${i}"]:checked`);
+                const userAnswer = selectedOption ? selectedOption.value : null;
+                const isCorrect = userAnswer === questionsData[i].correct;
+                
+                if (isCorrect) score++;
+
+                reviewHTML += `
+                    <div class="card result-item ${isCorrect ? 'status-correct' : 'status-wrong'}">
+                        <div class="question-number">${i + 1}-savol</div>
+                        <p class="question-text">${questionsData[i].q.replace(/\n/g, '<br>')}</p>
+                        <div class="table-data">
+                            <strong>Sizning javobingiz:</strong> 
+                            <span class="${isCorrect ? 'text-correct' : 'text-wrong'}">
+                                ${userAnswer || 'Javob berilmagan'}
+                            </span>
+                        </div>
+                        ${!isCorrect ? `
+                        <div class="table-data text-correct" style="background:#f0fdf4;">
+                            <strong>To'g'ri javob:</strong> ${questionsData[i].correct}
+                        </div>` : ''}
+                    </div>
+                `;
+            }
+
+            // Natijani ko'rsatish
+            const percentage = ((score / questionsData.length) * 100).toFixed(1);
+            document.getElementById('quiz-screen').style.display = 'none';
+            document.getElementById('results-screen').style.display = 'block';
+            
+            document.getElementById('correct-count').textContent = score;
+            document.getElementById('percentage').textContent = percentage;
+            document.getElementById('review-container').innerHTML = reviewHTML;
+            
+            window.scrollTo(0, 0);
+        }
+    </script>
+
+</body>
+</html>
